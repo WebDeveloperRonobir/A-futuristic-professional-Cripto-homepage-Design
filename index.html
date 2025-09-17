@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smarter Crypto Trading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d0d;
+            color: #d1d5db; /* Light gray for text */
+            overflow-x: hidden;
+        }
+        .text-cyan { color: #00d2d3; } /* Custom cyan color */
+        .bg-cyan { background-color: #00d2d3; }
+        .border-cyan { border-color: #00d2d3; }
+        .text-gray-400 { color: #9ca3af; }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: #00d2d3;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+            background: #00d2d3;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button-glow:hover {
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.7);
+        }
+        .3d-canvas {
+            width: 100%;
+            height: 400px;
+            display: block;
+        }
+
+        /* Dashboard specific styles */
+        .dashboard-card {
+            background-color: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 12px;
+        }
+        .chart-canvas {
+            background: linear-gradient(180deg, rgba(0, 210, 211, 0.1) 0%, rgba(0, 210, 211, 0) 100%);
+        }
+        .price-up { color: #10b981; }
+        .price-down { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-[#0d0d0d]">
+
+    <!-- Header & Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-[#0d0d0d]/80 backdrop-blur-md shadow-lg">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/40x40/0d0d0d/00d2d3?text=FSI" alt="FSILab Logo" class="h-10 w-10">
+                <span class="text-2xl font-extrabold text-cyan">FSI<span class="text-gray-400 font-light">Lab</span></span>
+            </div>
+            
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex space-x-6 lg:space-x-12 items-center">
+                <a href="#track-records" class="text-gray-400 hover:text-white nav-link">Track Records</a>
+                <a href="#our-approach" class="text-gray-400 hover:text-white nav-link">Our Approach</a>
+                <a href="#about-us" class="text-gray-400 hover:text-white nav-link">About Us</a>
+                <a href="#insights" class="text-gray-400 hover:text-white nav-link">Insights</a>
+                <a href="#partners-access" class="text-gray-400 hover:text-white nav-link">Register / Login</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden p-2 text-gray-400 focus:outline-none focus:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-[#0d0d0d] px-4 pt-2 pb-4 shadow-md">
+            <a href="#track-records" class="block py-2 text-gray-400 hover:text-white border-b border-gray-700">Track Records</a>
+            <a href="#our-approach" class="block py-2 text-gray-400 hover:text-white border-b border-gray-700">Our Approach</a>
+            <a href="#about-us" class="block py-2 text-gray-400 hover:text-white border-b border-gray-700">About Us</a>
+            <a href="#insights" class="block py-2 text-gray-400 hover:text-white border-b border-gray-700">Insights</a>
+            <a href="#partners-access" class="block py-2 text-gray-400 hover:text-white border-b border-gray-700">Register / Login</a>
+        </div>
+    </header>
+
+    <main class="mt-20">
+        <!-- Hero Section with Dashboard -->
+        <section id="hero-section" class="min-h-screen flex items-center justify-center p-4">
+            <div class="container mx-auto text-center max-w-7xl px-4">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-6">
+                    Smarter Crypto Trading <br><span class="text-cyan">with Automated Systems</span>
+                </h1>
+                
+                <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-8 mt-12">
+                    <!-- Dashboard Card -->
+                    <div class="dashboard-card p-6 w-full lg:w-2/3">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                            <h2 class="text-xl font-bold text-white">Market Overview</h2>
+                            <span class="text-gray-400 text-sm">Last 24 hours</span>
+                        </div>
+                        <canvas id="crypto-chart" class="w-full h-64 chart-canvas rounded-lg mb-4"></canvas>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-400">
+                                <thead class="text-xs uppercase text-gray-400 bg-[#141414]">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-6 rounded-tl-lg">Asset</th>
+                                        <th scope="col" class="py-3 px-6">Price</th>
+                                        <th scope="col" class="py-3 px-6 hidden sm:table-cell">Change (24h)</th>
+                                        <th scope="col" class="py-3 px-6 hidden md:table-cell">Market Cap</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="crypto-table-body" class="divide-y divide-gray-700">
+                                    <!-- Rows will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <a href="#track-records" class="bg-cyan text-black px-8 py-3 rounded-full font-semibold text-lg hover:bg-white transition-colors button-glow">View Track Record</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 20 Years Section -->
+        <section id="about-us" class="py-24">
+            <div class="container mx-auto px-4 text-center">
+                <div class="relative flex flex-col lg:flex-row items-center justify-center space-y-12 lg:space-y-0 lg:space-x-12">
+                    <!-- 3D Canvas for "20" -->
+                    <div class="w-full lg:w-1/2 flex justify-center items-center">
+                        <canvas id="canvas-20" class="3d-canvas w-full h-[400px]"></canvas>
+                    </div>
+
+                    <!-- Text Content -->
+                    <div class="w-full lg:w-1/2 text-left">
+                        <h2 class="text-4xl sm:text-5xl font-extrabold text-white mb-8 leading-tight">
+                            20 Years <br>of Empowering Partners
+                        </h2>
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="text-xl font-bold text-cyan mb-2">Expertise & Credibility</h3>
+                                <p class="text-gray-400">Backed by FSI Group’s long history in regulated trading and investment management.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-cyan mb-2">Innovation & Research</h3>
+                                <p class="text-gray-400">Developing next‑generation trading strategies to thrive in dynamic markets.</p>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-cyan mb-2">Execution & Reliability</h3>
+                                <p class="text-gray-400">Proven infrastructure engineered for speed, stability, and precision at scale.</p>
+                            </div>
+                        </div>
+                        <a href="#" class="mt-8 inline-block border border-cyan text-cyan px-6 py-3 rounded-full font-semibold hover:bg-cyan hover:text-black transition-colors button-glow">Learn more about FSI</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Allocate with Clarity Section -->
+        <section id="our-approach" class="py-24 bg-[#141414] min-h-screen flex items-center">
+            <div class="container mx-auto px-4 text-center max-w-2xl">
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight">
+                    Allocate with Clarity
+                </h2>
+                <h3 class="text-2xl sm:text-3xl font-semibold text-cyan mb-8">
+                    Easy to Start, Built to Last
+                </h3>
+                <p class="text-lg text-gray-400 max-w-xl mx-auto">
+                    From your first trade to lasting success, we make every step secure and simple.
+                </p>
+                <div class="mt-12 w-full aspect-video rounded-lg overflow-hidden border border-gray-700 shadow-xl">
+                   
+                   <img src="img/05.jpg" alt="Placeholder for an animation or video" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Three Pillars -->
+        <section id="insights" class="py-24">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-16">
+                    Our Three Pillars <br><span class="text-cyan">Driving Smarter Trading</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Pillar 1 -->
+                    <div class="relative bg-[#1a1a1a] rounded-xl p-8 card-shadow border border-gray-800 overflow-hidden">
+                        <!-- <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('img/06.jpg')"></div> -->
+                        <div class="relative z-10 text-center">
+
+                            <div class="mb-4">
+                                <h3 class="text-2xl font-bold text-white mb-2">Building the Strong</h3>
+                                <h3 class="text-2xl font-bold text-cyan">Foundation of Crypto Trading</h3>
+                            </div>
+                            <img src="img/06.jpg" alt="">
+                            <p class="text-sm text-gray-500 mt-4">Theme: Confident Investor – A person standing tall against a city skyline with abstract crypto graphics (like Bitcoin/Ethereum icons) overlayed, symbolizing trust and stability.</p>
+                        </div>
+                    </div>
+                    <!-- Pillar 2 -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-8 card-shadow border border-gray-800">
+                        <div class="flex flex-col h-full">
+                            <h3 class="text-2xl font-bold text-white mb-2">System Optimization</h3>
+                            <h3 class="text-2xl font-bold text-cyan">for Continuous Trading Excellence</h3>
+                            <img src="img/07.jpg" alt="">
+                            <div class="mt-auto pt-6 text-sm text-gray-400 space-y-2">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Algorithmic / Quantitative</li>
+                                    <li>Backtesting / Modeling</li>
+                                    <li>Resilience / Adaptation</li>
+                                    <li>Integration / Forecasting</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pillar 3 -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-8 card-shadow border border-gray-800">
+                        <div class="flex flex-col h-full">
+                            <h3 class="text-2xl font-bold text-white mb-2">Execution & Integration</h3>
+                            <h3 class="text-2xl font-bold text-cyan">for Precision Performance</h3>
+                            <img src="img/08.png" alt="">
+                            <div class="mt-auto pt-6 text-sm text-gray-400 space-y-2">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                    <span>Seamless Connectivity: Fast, secure exchange access.</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                    <span>Robust Infrastructure: Stable, scalable systems.</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-4 h-4 text-cyan" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                    <span>Precision Execution: Cost-efficient, accurate trades.</span>
+                                </div>
+                                <a href="#" class="mt-4 inline-block border border-gray-700 text-gray-400 px-4 py-2 rounded-full font-semibold hover:bg-gray-700 hover:text-white transition-colors">Learn more</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pick and Mix Strategies -->
+        <section id="track-records" class="py-24 bg-[#141414]">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-12">
+                    Pick and Mix<br><span class="text-cyan">Strategies for All Partners</span>
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Strategy Card 1: Anchor -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-6 text-center card-shadow border border-gray-800">
+                        <span class="text-5xl mb-4 inline-block">🛡️</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Anchor</h3>
+                        <p class="text-gray-400 mb-4">Stable in any market</p>
+                        <p class="text-lg font-semibold text-cyan mb-2">~0.10%/day</p>
+                        <p class="text-sm font-light text-gray-500 mb-4">Low risk (MDD < 10%)</p>
+                        <p class="text-sm text-gray-400">For steady hands and capital preservation.</p>
+                    </div>
+                    <!-- Strategy Card 2: Steady -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-6 text-center card-shadow border border-gray-800">
+                        <span class="text-5xl mb-4 inline-block">⚖️</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Steady</h3>
+                        <p class="text-gray-400 mb-4">Balanced growth</p>
+                        <p class="text-lg font-semibold text-cyan mb-2">~0.20%/day</p>
+                        <p class="text-sm font-light text-gray-500 mb-4">Moderate risk (MDD < 40%)</p>
+                        <p class="text-sm text-gray-400">For consistent growth with manageable swings.</p>
+                    </div>
+                    <!-- Strategy Card 3: Turbo -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-6 text-center card-shadow border border-gray-800">
+                        <span class="text-5xl mb-4 inline-block">🚀</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Turbo</h3>
+                        <p class="text-gray-400 mb-4">High‑octane upside</p>
+                        <p class="text-lg font-semibold text-cyan mb-2">~0.50%/day</p>
+                        <p class="text-sm font-light text-gray-500 mb-4">Higher risk (MDD < 80%)</p>
+                        <p class="text-sm text-gray-400">For bold investors chasing big gains.</p>
+                    </div>
+                    <!-- Strategy Card 4: Blaze -->
+                    <div class="bg-[#1a1a1a] rounded-xl p-6 text-center card-shadow border border-gray-800">
+                        <span class="text-5xl mb-4 inline-block">🔥</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Blaze</h3>
+                        <p class="text-gray-400 mb-4">Fast compounding</p>
+                        <p class="text-lg font-semibold text-cyan mb-2">~1.00%/day</p>
+                        <p class="text-sm font-light text-gray-500 mb-4">Roller coaster</p>
+                        <p class="text-sm text-gray-400">For thrill‑seekers ready for wild rides.</p>
+                    </div>
+                </div>
+                <div class="text-center mt-12">
+                    <a href="#" class="inline-block border border-cyan text-cyan px-8 py-3 rounded-full font-semibold hover:bg-cyan hover:text-black transition-colors button-glow">View Full Track Record &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Partners Access Section -->
+        <section id="partners-access" class="py-24 bg-[#1a1a1a] text-center">
+            <div class="container mx-auto px-4 max-w-2xl">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+                    Want to access detailed reports, live dashboards, and start allocating your coins?
+                </h2>
+                <div class="flex items-center justify-center space-x-4 mb-4">
+                    <a href="#" class="text-cyan font-semibold hover:underline">Sign in &rarr;</a>
+                    <a href="#" class="text-cyan font-semibold hover:underline">Sign up &rarr;</a>
+                </div>
+                <p class="text-sm text-gray-500">
+                    Access is restricted to approved partners and collaborators.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-16">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <!-- Newsletter -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">🔹 Subscribe to Our Newsletter</h4>
+                <p class="text-sm text-gray-400 mb-4">Stay updated with latest insights, strategy updates, and FSI Lab news.</p>
+                <form id="newsletter-form" class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input type="email" placeholder="📧 Enter your email" class="flex-1 p-3 rounded-md bg-gray-400 text-white placeholder-gray-300 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan" required>
+                    
+                    <button type="submit" class="bg-cyan text-black px-6 py-3 rounded-md font-semibold hover:bg-white transition-colors">Subscribe</button>
+                </form>
+                <p class="text-xs text-gray-500 mt-2">We respect your privacy — no spam, ever.</p>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">🔹 Quick Navigation</h4>
+                <ul class="text-sm space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:underline">Home</a></li>
+                    <li><a href="#about-us" class="hover:underline">About Us</a></li>
+                    <li><a href="#our-approach" class="hover:underline">Our Approach</a></li>
+                    <li><a href="#track-records" class="hover:underline">Track Record</a></li>
+                    <li><a href="#insights" class="hover:underline">Insights & News</a></li>
+                    <li><a href="#partners-access" class="hover:underline">Partner Login</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact & Legal -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">🔹 Contact</h4>
+                <address class="text-sm text-gray-400 not-italic space-y-2">
+                    <p>FSI Lab — New York Office</p>
+                    <p>40 Wall Street, 28th Floor<br>New York, NY 10005</p>
+                    <p>📞 +1 855 630 2139</p>
+                    <p>✉️ hi@fsiprime.com</p>
+                </address>
+                <h4 class="text-lg font-bold text-white mt-8 mb-4">🔹 Legal</h4>
+                <ul class="text-sm space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:underline">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:underline">Risk Disclosure</a></li>
+                    <li><a href="#" class="hover:underline">Terms of Use</a></li>
+                </ul>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">🔹 Disclaimer</h4>
+                <p class="text-sm text-gray-400 mb-4">FSI Lab is a trade name of FSICP Limited. Past results are not guaranteed. Crypto trading involves substantial risk. All performance shown is illustrative and may be unaudited. Allocation examples are educational only and do not represent recommendations.</p>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-500">
+            <p class="text-sm">&copy; 2025 FSICP Limited. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile menu functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                document.querySelectorAll('#mobile-menu a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Simple form handling to prevent page refresh
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Form submitted:', new FormData(form));
+                    const formMessage = document.createElement('div');
+                    formMessage.textContent = "Thank you for your submission!";
+                    formMessage.className = "mt-4 p-3 bg-cyan text-black rounded-lg text-sm font-semibold";
+                    form.parentNode.appendChild(formMessage);
+                    setTimeout(() => formMessage.remove(), 3000);
+                    form.reset();
+                });
+            });
+
+            // 3D Rotating Number Animation with three.js
+            window.onload = function() {
+                const canvas = document.getElementById('canvas-20');
+                if (canvas) {
+                    let scene, camera, renderer, textMesh;
+                    const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json';
+
+                    // Function to initialize the scene
+                    function init() {
+                        scene = new THREE.Scene();
+                        camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+                        renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+                        // Lighting
+                        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                        scene.add(ambientLight);
+                        const pointLight = new THREE.PointLight(0x00d2d3, 1, 100);
+                        pointLight.position.set(5, 5, 5);
+                        scene.add(pointLight);
+
+                        // Load Font and create Text
+                        const loader = new THREE.FontLoader();
+                        loader.load(fontUrl, function(font) {
+                            const textGeometry = new THREE.TextGeometry('20', {
+                                font: font,
+                                size: 30,
+                                height: 5,
+                                curveSegments: 12,
+                                bevelEnabled: true,
+                                bevelThickness: 1,
+                                bevelSize: 0.5,
+                                bevelSegments: 3
+                            });
+                            textGeometry.center();
+                            const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00d2d3 });
+                            textMesh = new THREE.Mesh(textGeometry, textMaterial);
+                            scene.add(textMesh);
+                        });
+
+                        camera.position.z = 50;
+                    }
+
+                    // Animation loop
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        if (textMesh) {
+                            textMesh.rotation.y += 0.005;
+                        }
+                        renderer.render(scene, camera);
+                    }
+
+                    // Handle window resizing
+                    window.addEventListener('resize', onWindowResize, false);
+                    function onWindowResize() {
+                        canvas.style.width = '100%';
+                        canvas.style.height = '400px';
+                        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                    }
+
+                    init();
+                    animate();
+                }
+
+                // Crypto Dashboard functionality
+                const cryptoCanvas = document.getElementById('crypto-chart');
+                const cryptoTableBody = document.getElementById('crypto-table-body');
+
+                if (cryptoCanvas && cryptoTableBody) {
+                    const ctx = cryptoCanvas.getContext('2d');
+                    
+                    const cryptoData = [
+                        { name: 'Bitcoin', symbol: 'BTC', price: 65123.45, change: 2.56, marketCap: '1.28T' },
+                        { name: 'Ethereum', symbol: 'ETH', price: 3456.78, change: -1.23, marketCap: '414B' },
+                        { name: 'BNB', symbol: 'BNB', price: 589.12, change: 0.89, marketCap: '88B' },
+                        { name: 'Solana', symbol: 'SOL', price: 178.90, change: 4.15, marketCap: '80B' },
+                        { name: 'Ripple', symbol: 'XRP', price: 0.52, change: -0.56, marketCap: '28B' }
+                    ];
+
+                    const chartData = {
+                        labels: Array.from({ length: 20 }, (_, i) => i),
+                        values: Array.from({ length: 20 }, () => 100 + Math.random() * 20),
+                        color: '#00d2d3'
+                    };
+
+                    function drawChart() {
+                        if (!ctx) return;
+                        const width = cryptoCanvas.width;
+                        const height = cryptoCanvas.height;
+                        ctx.clearRect(0, 0, width, height);
+
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = chartData.color;
+                        ctx.beginPath();
+                        
+                        const maxVal = Math.max(...chartData.values);
+                        const minVal = Math.min(...chartData.values);
+                        const range = maxVal - minVal;
+
+                        const xStep = width / (chartData.labels.length - 1);
+
+                        // Starting point
+                        ctx.moveTo(0, height - ((chartData.values[0] - minVal) / range) * height);
+
+                        // Draw the line
+                        for (let i = 1; i < chartData.values.length; i++) {
+                            const x = i * xStep;
+                            const y = height - ((chartData.values[i] - minVal) / range) * height;
+                            ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+
+                        // Draw a fill gradient
+                        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                        gradient.addColorStop(0, 'rgba(0, 210, 211, 0.4)');
+                        gradient.addColorStop(1, 'rgba(0, 210, 211, 0)');
+                        ctx.lineTo(width, height);
+                        ctx.lineTo(0, height);
+                        ctx.closePath();
+                        ctx.fillStyle = gradient;
+                        ctx.fill();
+                    }
+
+                    function updateTable() {
+                        cryptoTableBody.innerHTML = '';
+                        cryptoData.forEach(asset => {
+                            const changeClass = asset.change >= 0 ? 'price-up' : 'price-down';
+                            const changeSymbol = asset.change >= 0 ? '▲' : '▼';
+                            const row = `
+                                <tr class="bg-gray-800 hover:bg-gray-700 transition-colors">
+                                    <th scope="row" class="py-4 px-6 font-medium text-white whitespace-nowrap">${asset.name}<span class="text-gray-500 ml-2">${asset.symbol}</span></th>
+                                    <td class="py-4 px-6">$${asset.price.toFixed(2)}</td>
+                                    <td class="py-4 px-6 hidden sm:table-cell"><span class="${changeClass}">${changeSymbol} ${Math.abs(asset.change).toFixed(2)}%</span></td>
+                                    <td class="py-4 px-6 hidden md:table-cell">$${asset.marketCap}</td>
+                                </tr>
+                            `;
+                            cryptoTableBody.innerHTML += row;
+                        });
+                    }
+
+                    // Handle canvas resizing
+                    function resizeCanvas() {
+                        const parent = cryptoCanvas.parentElement;
+                        cryptoCanvas.width = parent.clientWidth;
+                        cryptoCanvas.height = 256;
+                        drawChart();
+                    }
+
+                    window.addEventListener('resize', resizeCanvas);
+                    resizeCanvas();
+                    updateTable();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
